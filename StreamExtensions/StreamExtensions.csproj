@@ -16,6 +16,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\DotNet.Extensions.snk</AssemblyOriginatorKeyFile>
+    <PackageId>quexy.StreamExtensions</PackageId>
+    <Product>quexy.StreamExtensions</Product>
   </PropertyGroup>
 
   <ItemGroup>
