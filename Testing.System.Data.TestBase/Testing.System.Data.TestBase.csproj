@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <Authors>quexy</Authors>
+    <Company />
+    <Description>Base class to setup testing SQL interaction without databases using System.Data.Fakes and Moq</Description>
+    <Configurations>Release</Configurations>
+    <Copyright>Copyright (c) 2017</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/quexy/DotNet.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/quexy/DotNet.Extensions</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/icon.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\DotNet.Extensions.snk</AssemblyOriginatorKeyFile>
+    <PackageTags>System.Data SqlClient sql testing DbTestBase</PackageTags>
+    <PackageId>quexy.Testing.System.Data.TestBase</PackageId>
+    <Product>quexy.Testing.System.Data.TestBase</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Moq" Version="4.7.145" />
+    <PackageReference Include="quexy.Testing.System.Data.Fakes" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
