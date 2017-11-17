@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace System.Data
 {
-    public static class SqlExtensions
+    public static class SqlClientExtensions
     {
         public static string ArgPrefix = "@";
         private static readonly BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public;

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IO.StreamExtensions", "System.IO.StreamExtensions\System.IO.StreamExtensions.csproj", "{63F59AEF-6E58-4C78-A051-A597DEF3D638}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.IO.StreamExtensions", "StreamExtensions\StreamExtensions.csproj", "{63F59AEF-6E58-4C78-A051-A597DEF3D638}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.SqlExtensions", "System.Data.SqlExtensions\System.Data.SqlExtensions.csproj", "{4DCA8C11-E43C-48D3-AC1D-D1FB58D19B30}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Data.SqlExtensions", "SqlClientExtensions\SqlClientExtensions.csproj", "{4DCA8C11-E43C-48D3-AC1D-D1FB58D19B30}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
