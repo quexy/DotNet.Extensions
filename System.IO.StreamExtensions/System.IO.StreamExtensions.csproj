@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <Authors>quexy</Authors>
+    <Company />
+    <Description>Extension methods to simplify working with streams: reading and writing simple builtin types</Description>
+    <PackageTags>stream extensions</PackageTags>
+    <Configurations>Release</Configurations>
+    <Copyright>Copyright (c) 2017</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/quexy/DotNet.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/quexy/DotNet.Extensions</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/icon.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\DotNet.Extensions.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO" Version="4.3.0" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
