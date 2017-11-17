@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
 namespace System.Data.Fakes.QueryHandling.Impl
 {
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     abstract class AbstractQueryHandlerBuilder<TArgChecker, TResult> : IArgChecker<TArgChecker>, IQueryString
     {
         private readonly List<Regex> QueryRegex = new List<Regex>();

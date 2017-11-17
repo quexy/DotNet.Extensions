@@ -1,13 +1,13 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace System.Data.Fakes
 {
-    using System.Collections;
-    using System.Collections.Generic;
-
     public class DataParameterCollection : IDataParameterCollection
     {
         private readonly object syncRoot = new object();
-        private readonly System.Collections.ArrayList Parameters = new System.Collections.ArrayList();
-        public List<System.Collections.ArrayList> History { get; } = new List<System.Collections.ArrayList>();
+        private readonly ArrayList Parameters = new ArrayList();
+        public List<ArrayList> History { get; } = new List<ArrayList>();
 
         public object this[int index]
         {
@@ -32,7 +32,7 @@ namespace System.Data.Fakes
 
         public void Clear()
         {
-            var hist = new System.Collections.ArrayList();
+            var hist = new ArrayList();
             hist.AddRange(Parameters);
             History.Add(hist);
             Parameters.Clear();

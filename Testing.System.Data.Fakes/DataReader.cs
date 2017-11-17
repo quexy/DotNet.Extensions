@@ -1,10 +1,10 @@
+using System.Linq;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Globalization;
+
 namespace System.Data.Fakes
 {
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Globalization;
-
     public class DataReader : IDataReader
     {
         private static readonly StringComparer comparer = StringComparer.OrdinalIgnoreCase;

@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
 namespace System.Data.Fakes.QueryHandling.Impl
 {
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     sealed class ExecuteReaderQueryHandlerBuilder<T> : AbstractQueryHandlerBuilder<IExecuteReaderQueryHandlerBuilderArgChecker<T>, T[]>,
         IExecuteReaderQueryHandlerBuilder<T>, IExecuteReaderQueryHandlerBuilderArgChecker<T> where T : class
     {

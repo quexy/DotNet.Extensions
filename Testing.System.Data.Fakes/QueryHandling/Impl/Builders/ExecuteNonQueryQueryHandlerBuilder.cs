@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+
 namespace System.Data.Fakes.QueryHandling.Impl
 {
-    using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-
     sealed class ExecuteNonQueryQueryHandlerBuilder : AbstractQueryHandlerBuilder<IExecuteNonQueryQueryHandlerBuilderArgChecker, int>,
         IExecuteNonQueryQueryHandlerBuilder, IExecuteNonQueryQueryHandlerBuilderArgChecker
     {
