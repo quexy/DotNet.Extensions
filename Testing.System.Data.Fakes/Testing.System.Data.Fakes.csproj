@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <Authors>quexy</Authors>
+    <Company />
+    <Description>Simple fakes for testing SQL interaction without databases</Description>
+    <Configurations>Release</Configurations>
+    <Copyright>Copyright (c) 2017</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/quexy/DotNet.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/quexy/DotNet.Extensions</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/icon.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\DotNet.Extensions.snk</AssemblyOriginatorKeyFile>
+    <PackageTags>System.Data SqlClient sql fake mock</PackageTags>
+    <PackageId>quexy.Testing.System.Data.Fakes</PackageId>
+    <Product>quexy.Testing.System.Data.Fakes</Product>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="quexy.SqlClientExtensions" Version="1.0.0" />
+    <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
+  </ItemGroup>
+
+</Project>
