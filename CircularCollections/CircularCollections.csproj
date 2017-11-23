@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <Authors>quexy</Authors>
+    <Company />
+    <Description>Circular stack and queue</Description>
+    <Configurations>Release</Configurations>
+    <Copyright>Copyright (c) 2017</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/quexy/DotNet.Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/quexy/DotNet.Extensions</RepositoryUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/icon.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\DotNet.Extensions.snk</AssemblyOriginatorKeyFile>
+    <PackageTags>circular stack queue collection</PackageTags>
+    <PackageId>quexy.System.Collections.Circular</PackageId>
+    <Product>quexy.System.Collections.Circular</Product>
+  </PropertyGroup>
+
+</Project>
