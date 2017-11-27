@@ -57,7 +57,7 @@ namespace System.Data
             if (arguments == null) throw new ArgumentNullException("arguments");
 
             var propertyArray = arguments.GetType().GetProperties(bindingFlags)
-                .Where(p => p.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                .Where(p => p.GetCustomAttribute<SqlIgnoreAttribute>() == null)
                 .Where(p => p.CanRead).ToArray();
 
             foreach (var property in propertyArray)
@@ -103,7 +103,7 @@ namespace System.Data
 
             var fields = Enumerable.Range(0, reader.FieldCount).Select(i => reader.GetName(i).ToUpperInvariant()).ToArray();
             var columns = typeof(T).GetProperties(bindingFlags).AsParallel().WithCancellation(cancellation).Where(p => p.CanWrite)
-                .Where(p => fields.Contains(p.Name.ToUpperInvariant())).Where(p => p.GetCustomAttribute<SqlIgnoreAttribute>() != null)
+                .Where(p => fields.Contains(p.Name.ToUpperInvariant())).Where(p => p.GetCustomAttribute<SqlIgnoreAttribute>() == null)
                 .Select(p => new { Property = p, Field = new { Name = p.Name, Index = reader.GetIndex(p.Name, strict) } }).ToArray();
             var nullSetters = columns.Select(p => p.Property.Name).ToDictionary(n => n, n => typeof(T).GetMethod("Set" + n + "Null", bindingFlags));
 

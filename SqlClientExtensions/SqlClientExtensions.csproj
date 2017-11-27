@@ -18,6 +18,7 @@
     <AssemblyOriginatorKeyFile>..\DotNet.Extensions.snk</AssemblyOriginatorKeyFile>
     <PackageId>quexy.SqlClientExtensions</PackageId>
     <Product>quexy.SqlClientExtensions</Product>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
