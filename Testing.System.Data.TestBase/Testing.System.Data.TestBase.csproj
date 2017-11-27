@@ -18,11 +18,12 @@
     <PackageTags>System.Data SqlClient sql testing DbTestBase</PackageTags>
     <PackageId>quexy.Testing.System.Data.TestBase</PackageId>
     <Product>quexy.Testing.System.Data.TestBase</Product>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Moq" Version="4.7.145" />
-    <PackageReference Include="quexy.Testing.System.Data.Fakes" Version="1.0.0" />
+    <PackageReference Include="quexy.Testing.System.Data.Fakes" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
