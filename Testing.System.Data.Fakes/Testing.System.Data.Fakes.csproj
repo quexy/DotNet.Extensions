@@ -18,11 +18,13 @@
     <PackageTags>System.Data SqlClient sql fake mock</PackageTags>
     <PackageId>quexy.Testing.System.Data.Fakes</PackageId>
     <Product>quexy.Testing.System.Data.Fakes</Product>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="quexy.SqlClientExtensions" Version="1.0.0" />
+    <PackageReference Include="quexy.SqlClientExtensions" Version="1.0.1" />
     <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
+    <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.4.0" />
   </ItemGroup>
