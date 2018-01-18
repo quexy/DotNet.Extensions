@@ -7,9 +7,11 @@ namespace System.IO
 {
     public static class StreamExtensions
     {
-        public static Endianness Endianness = Endianness.BigEndian;
+        public static Endianness Endianness = Endianness.Unspecified;
 
-        public static byte[] ReadBytes(this Stream stream, int length)
+        /// <summary> Reads the specified amount of bytes from the stream </summary>
+        /// <exception cref="InvalidOperationException"> if the stream did not contain enough bytes </exception>
+        public static byte[] ReadBuffer(this Stream stream, int length)
         {
             if (stream == null) throw new ArgumentNullException("stream");
             if (length < 0) throw new ArgumentOutOfRangeException("length", "length cannot be negtive");
@@ -21,58 +23,87 @@ namespace System.IO
             throw new InvalidOperationException(WrongRead(read, length));
         }
 
+        /// <summary> Reads an array from the stream; length is the next four bytes in the specified endianness </summary>
+        public static byte[] ReadBytes(this Stream stream, Endianness endianness = Endianness.Unspecified)
+        {
+            return stream.ReadBuffer(stream.ReadValue<int>(endianness));
+        }
+
+        /// <summary> Reads the given amount of bytes to a string by the specified encoding </summary>
         public static string ReadFixString(this Stream stream, int length, Encoding encoding = null)
         {
-            if (encoding == null) encoding = GetDefaultEncoding();
-            return encoding.GetString(stream.ReadBytes(length), 0, length);
+            if (encoding == null) encoding = GetDefaultEncoding(Endianness.Unspecified);
+            return encoding.GetString(stream.ReadBuffer(length), 0, length);
         }
 
-        public static string ReadShortString(this Stream stream, Encoding encoding = null)
+        /// <summary> Reads a string in the specified encoding from the stream; lenght is the next byte in the stream </summary>
+        public static string ReadShortString(this Stream stream, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
-            return stream.ReadFixString(stream.ReadValue<byte>(), encoding);
+            if (encoding == null) encoding = GetDefaultEncoding(endianness);
+            return ReadFixString(stream, ReadValue<byte>(stream, endianness), encoding);
         }
 
-        public static string ReadString(this Stream stream, Encoding encoding = null)
+        /// <summary> Reads a string in the specified encoding from the stream; lenght (4 bytes) read in the given endianness </summary>
+        public static string ReadString(this Stream stream, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
-            return stream.ReadFixString(stream.ReadValue<int>(), encoding);
+            if (encoding == null) encoding = GetDefaultEncoding(endianness);
+            return stream.ReadFixString(stream.ReadValue<int>(endianness), encoding);
         }
 
-        public static T ReadValue<T>(this Stream stream) where T : struct
+        /// <summary> Reads the given type from the stream in the specified endianness </summary>
+        public static T ReadValue<T>(this Stream stream, Endianness endianness = Endianness.Unspecified) where T : struct
         {
-            return stream.ReadBytes(GetLength<T>()).FixEndianness().ChangeType<T>();
+            return stream.ReadBuffer(GetLength<T>()).FixEndianness(endianness).ChangeType<T>();
         }
 
-        public static Stream WriteBytes(this Stream stream, byte[] buffer)
+        /// <summary> Writes the array to the stream </summary>
+        public static Stream WriteBuffer(this Stream stream, byte[] buffer)
         {
-            return stream.WriteValue(buffer.Length).WriteBuffer(buffer);
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (buffer != null && buffer.Length > 0)
+                stream.Write(buffer, 0, buffer.Length);
+            return stream;
         }
 
+        /// <summary> Writes length and the array into the stream; length (4 bytes) is converted to the specified endianness </summary>
+        public static Stream WriteBytes(this Stream stream, byte[] buffer, Endianness endianness = Endianness.Unspecified)
+        {
+            return stream.WriteValue(buffer.Length, endianness).WriteBuffer(buffer);
+        }
+
+        /// <summary> Writes the string to the stream after padding it to the given length </summary>
+        /// <exception cref="ArgumentException"> if the string is longer than specified </exception>
         public static Stream WriteFixString(this Stream stream, string value, int length, Encoding encoding = null)
         {
-            if (encoding == null) encoding = GetDefaultEncoding();
+            if (encoding == null) encoding = GetDefaultEncoding(Endianness.Unspecified);
             value = (value ?? "").PadRight(length, ' ');
+            if (value.Length > length) // verify string is exactly 'length' long
+                throw new ArgumentException(nameof(value), "the string is too long");
             return stream.WriteBuffer(encoding.GetBytes(value));
         }
 
-        public static Stream WriteShortString(this Stream stream, string value, Encoding encoding = null)
+        /// <summary> Writes length and the string to the stream; length should fit into a byte </summary>
+        public static Stream WriteShortString(this Stream stream, string value, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
-            if (encoding == null) encoding = GetDefaultEncoding();
+            if (encoding == null) encoding = GetDefaultEncoding(endianness);
             var buffer = encoding.GetBytes(value ?? "");
-            if (buffer.Length <= byte.MaxValue) //verify length fits into a single byte
-                return stream.WriteValue((byte)buffer.Length).WriteBuffer(buffer);
-            throw new ArgumentOutOfRangeException("value", "the string is too long");
+            if (buffer.Length > byte.MaxValue) //verify length fits into a single byte
+                throw new ArgumentOutOfRangeException(nameof(value), "the string is too long");
+            return stream.WriteValue((byte)buffer.Length, endianness).WriteBuffer(buffer);
         }
 
-        public static Stream WriteString(this Stream stream, string value, Encoding encoding = null)
+        /// <summary> Writes length and the string to the stream; length is converted to the specified endianness </summary>
+        public static Stream WriteString(this Stream stream, string value, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
-            if (encoding == null) encoding = GetDefaultEncoding();
+            if (encoding == null) encoding = GetDefaultEncoding(endianness);
             var buffer = encoding.GetBytes(value ?? "");
-            return stream.WriteValue(buffer.Length).WriteBuffer(buffer);
+            return stream.WriteValue(buffer.Length, endianness).WriteBuffer(buffer);
         }
 
-        public static Stream WriteValue<T>(this Stream stream, T value) where T : struct
+        /// <summary> Writes the given value to the stream in the specified endianness </summary>
+        public static Stream WriteValue<T>(this Stream stream, T value, Endianness endianness = Endianness.Unspecified) where T : struct
         {
-            return stream.WriteBuffer(GetBytes(value).FixEndianness());
+            return stream.WriteBuffer(GetBytes(value).FixEndianness(endianness));
         }
 
         private static int GetLength<T>() where T : struct { return GetLength(typeof(T)); }
@@ -107,6 +138,7 @@ namespace System.IO
             throw new NotSupportedException("Not supported type " + type.Name);
         }
 
+        /// <summary> Converts the given array to the specified type; byte order: platform endian </summary>
         public static T ChangeType<T>(this byte[] buffer, int startIndex = 0) where T : struct { return (T)ChangeType(buffer, typeof(T), startIndex); }
         private static object ChangeType(byte[] buffer, Type type, int startIndex)
         {
@@ -158,6 +190,7 @@ namespace System.IO
             throw new InvalidOperationException("Not supported type " + type.Name);
         }
 
+        /// <summary> Converts the given value into a byte array; byte order: platform endian </summary>
         public static byte[] GetBytes<T>(this T value) where T : struct { return GetBytes(value, typeof(T)); }
         private static byte[] GetBytes(object value, Type type)
         {
@@ -209,40 +242,44 @@ namespace System.IO
             throw new InvalidOperationException("Not supported type " + type.Name);
         }
 
-        private static byte[] FixEndianness(this byte[] data)
-        {
-            if (Endianness == Endianness.Unspecified) return data;
-            if (data.Length < 2) return data;
-
-            if (BitConverter.IsLittleEndian)
-            {
-                if (Endianness == Endianness.LittleEndian) return data;
-                else /* reverse */ return data.Reverse().ToArray();
-            }
-            else // architecture is big endian
-            {
-                if (Endianness == Endianness.BigEndian) return data;
-                else /* reverse */ return data.Reverse().ToArray();
-            }
-        }
-
-        private static Stream WriteBuffer(this Stream stream, byte[] buffer)
-        {
-            if (buffer != null && buffer.Length > 0)
-                stream.Write(buffer, 0, buffer.Length);
-            return stream;
-        }
-
         private static string WrongRead(int read, int length)
         {
             return string.Format("Read {0} bytes instead of {1}", read, length);
         }
 
-        private static Encoding GetDefaultEncoding()
+        private static byte[] FixEndianness(this byte[] data, Endianness endianness)
         {
-            return (Endianness == Endianness.BigEndian)
-                ? Encoding.BigEndianUnicode
-                : Encoding.Unicode;
+            var end = (endianness == Endianness.Unspecified)
+                ? Endianness : endianness;
+
+            if (end == Endianness.Unspecified) return data;
+            if (data.Length < 2) return data;
+
+            if (BitConverter.IsLittleEndian)
+            {
+                if (end != Endianness.BigEndian) return data;
+                else /* reverse */ return data.Reverse().ToArray();
+            }
+            else // architecture is big endian
+            {
+                if (end != Endianness.LittleEndian) return data;
+                else /* reverse */ return data.Reverse().ToArray();
+            }
+        }
+
+        private static Encoding GetDefaultEncoding(Endianness endianness)
+        {
+            var end = (endianness == Endianness.Unspecified)
+                ? Endianness : endianness;
+
+            if (BitConverter.IsLittleEndian)
+                return (end == Endianness.BigEndian)
+                    ? Encoding.BigEndianUnicode
+                    : Encoding.Unicode;
+            else // architecture is big endian
+                return (end != Endianness.LittleEndian)
+                    ? Encoding.BigEndianUnicode
+                    : Encoding.Unicode;
         }
     }
 }
