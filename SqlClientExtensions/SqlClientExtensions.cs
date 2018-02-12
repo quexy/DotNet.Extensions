@@ -45,10 +45,28 @@ namespace System.Data
             return param;
         }
 
-        public static void AddParameter<T>(this IDbCommand command, string name, T value)
+        public static IDbDataParameter AddParameter<T>(this IDbCommand command, string name, T value)
         {
             if (!name.StartsWith(ArgPrefix)) name = ArgPrefix + name;
-            command.AddParameter(name, GetDbType(typeof(T)), value);
+            return command.AddParameter(name, GetDbType(typeof(T)), value);
+        }
+
+        public static IDbDataParameter WithScale(this IDbDataParameter param, byte scale)
+        {
+            param.Scale = scale;
+            return param;
+        }
+
+        public static IDbDataParameter WithSize(this IDbDataParameter param, int size)
+        {
+            param.Size = size;
+            return param;
+        }
+
+        public static IDbDataParameter WithPrecision(this IDbDataParameter param, byte precision)
+        {
+            param.Precision = precision;
+            return param;
         }
 
         public static void AddParameters(this IDbCommand command, object arguments)
@@ -255,7 +273,7 @@ namespace System.Data
             throw new ArgumentException("Cannot convert to DbType", "type");
         }
 
-        private static void AddParameter(this IDbCommand command, string name, DbType dbType, object value)
+        private static IDbDataParameter AddParameter(this IDbCommand command, string name, DbType dbType, object value)
         {
             if (command == null) throw new ArgumentNullException("command");
             if (string.IsNullOrEmpty(name)) throw new ArgumentNullException("name");
@@ -269,6 +287,7 @@ namespace System.Data
             param.Value = value;
 
             command.Parameters.Add(param);
+            return param;
         }
 
         private static DateTime RoundToSeconds(DateTime value)
