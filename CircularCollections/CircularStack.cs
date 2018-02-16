@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-
-namespace System.Collections.Circular
+﻿namespace System.Collections.Circular
 {
+    using System.Collections.Generic;
+
+#if NET40
+    public sealed class CircularStack<TItem> : IEnumerable<TItem>, ICollection
+#else
     public sealed class CircularStack<TItem> : IEnumerable<TItem>, IReadOnlyCollection<TItem>, ICollection
+#endif
     {
         private int count = 0;
         private int offset = 0;
-        private object syncRoot = null;
         private readonly TItem[] buffer;
         public CircularStack(int size)
         {
@@ -15,6 +17,8 @@ namespace System.Collections.Circular
         }
 
         private int top => (offset + count - 1) % buffer.Length;
+
+        public int Size => buffer.Length;
 
         ///<returns> the item pushed out of the stack </returns>
         public TItem Push(TItem item)
@@ -72,7 +76,7 @@ namespace System.Collections.Circular
 
         public bool IsSynchronized => false;
 
-        public object SyncRoot => Interlocked.CompareExchange(ref syncRoot, new object(), null);
+        public object SyncRoot => this;
 
         public void CopyTo(TItem[] array, int offset)
         {

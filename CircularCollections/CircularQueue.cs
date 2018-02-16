@@ -1,18 +1,22 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-
-namespace System.Collections.Circular
+﻿namespace System.Collections.Circular
 {
+    using System.Collections.Generic;
+
+#if NET40
+    public sealed class CircularQueue<TItem> : IEnumerable<TItem>, ICollection
+#else
     public sealed class CircularQueue<TItem> : IEnumerable<TItem>, IReadOnlyCollection<TItem>, ICollection
+#endif
     {
         private int count = 0;
         private int offset = 0;
-        private object syncRoot = null;
         private readonly TItem[] buffer;
         public CircularQueue(int size)
         {
             buffer = new TItem[size];
         }
+
+        public int Size => buffer.Length;
 
         /// <returns> the item pushed out of the queue </returns>
         public TItem Enqueue(TItem item)
@@ -56,7 +60,7 @@ namespace System.Collections.Circular
 
         public bool IsSynchronized => false;
 
-        public object SyncRoot => Interlocked.CompareExchange(ref syncRoot, new object(), null);
+        public object SyncRoot => this;
 
         public IEnumerator<TItem> GetEnumerator()
         {

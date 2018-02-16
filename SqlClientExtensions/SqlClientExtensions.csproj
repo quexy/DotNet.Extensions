@@ -1,11 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFrameworks>net40;net45;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Authors>quexy</Authors>
     <Company />
     <Description>Extension methods to simplify working with SQL: running commands and queries, and reading data sets</Description>
-    <PackageTags>System.Data SqlClient sql extensions</PackageTags>
     <Configurations>Release</Configurations>
     <Copyright>Copyright (c) 2017</Copyright>
     <PackageLicenseUrl>https://raw.githubusercontent.com/quexy/DotNet.Extensions/master/LICENSE</PackageLicenseUrl>
@@ -16,12 +15,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\DotNet.Extensions.snk</AssemblyOriginatorKeyFile>
+    <PackageTags>System.Data SqlClient sql extensions</PackageTags>
     <PackageId>quexy.SqlClientExtensions</PackageId>
     <Product>quexy.SqlClientExtensions</Product>
-    <Version>1.1.1</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Linq.Parallel" Version="4.3.0" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />

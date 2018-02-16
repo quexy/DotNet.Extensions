@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFrameworks>net40;net45;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Authors>quexy</Authors>
     <Company />
     <Description>Simple fakes for testing SQL interaction without databases</Description>
@@ -18,10 +18,10 @@
     <PackageTags>System.Data SqlClient sql fake mock</PackageTags>
     <PackageId>quexy.Testing.System.Data.Fakes</PackageId>
     <Product>quexy.Testing.System.Data.Fakes</Product>
-    <Version>1.0.2</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.3'">
     <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />

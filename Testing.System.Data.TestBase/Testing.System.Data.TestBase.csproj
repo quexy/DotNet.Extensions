@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFrameworks>net40;net45;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Authors>quexy</Authors>
     <Company />
     <Description>Base class to setup testing SQL interaction without databases using System.Data.Fakes and Moq</Description>
@@ -18,12 +18,13 @@
     <PackageTags>System.Data SqlClient sql testing DbTestBase</PackageTags>
     <PackageId>quexy.Testing.System.Data.TestBase</PackageId>
     <Product>quexy.Testing.System.Data.TestBase</Product>
-    <Version>1.0.2</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moq" Version="4.7.145" />
-    <PackageReference Include="quexy.Testing.System.Data.Fakes" Version="1.0.2" />
+    <PackageReference Include="Moq" Version="4.0.10827" Condition="'$(TargetFramework)'=='net40'" />
+    <PackageReference Include="Moq" Version="4.8.0" Condition="'$(TargetFramework)'!='net40'" />
+    <PackageReference Include="quexy.Testing.System.Data.Fakes" Version="1.1.0" />
   </ItemGroup>
 
 </Project>

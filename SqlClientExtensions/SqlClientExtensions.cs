@@ -75,7 +75,11 @@ namespace System.Data
             if (arguments == null) throw new ArgumentNullException("arguments");
 
             var propertyArray = arguments.GetType().GetProperties(bindingFlags)
+#if NET40
+                .Where(p => !Attribute.IsDefined(p, typeof(SqlIgnoreAttribute)))
+#else
                 .Where(p => p.GetCustomAttribute<SqlIgnoreAttribute>() == null)
+#endif
                 .Where(p => p.CanRead).ToArray();
 
             foreach (var property in propertyArray)
@@ -96,7 +100,11 @@ namespace System.Data
             var resultType = typeof(T);
             var isNullable = (resultType.Name == typeof(Nullable<>).Name);
             if (isNullable) resultType = resultType.GetGenericArguments()[0];
+#if NETSTANDARD1_3
             var typeInfo = resultType.GetTypeInfo();
+#else
+            var typeInfo = resultType;
+#endif
 
             if (typeInfo.IsEnum)
             {
@@ -121,7 +129,11 @@ namespace System.Data
 
             var fields = Enumerable.Range(0, reader.FieldCount).Select(i => reader.GetName(i).ToUpperInvariant()).ToArray();
             var columns = typeof(T).GetProperties(bindingFlags).AsParallel().WithCancellation(cancellation).Where(p => p.CanWrite)
+#if NET40
+                .Where(p => fields.Contains(p.Name.ToUpperInvariant())).Where(p => !Attribute.IsDefined(p, typeof(SqlIgnoreAttribute)))
+#else
                 .Where(p => fields.Contains(p.Name.ToUpperInvariant())).Where(p => p.GetCustomAttribute<SqlIgnoreAttribute>() == null)
+#endif
                 .Select(p => new { Property = p, Field = new { Name = p.Name, Index = reader.GetIndex(p.Name, strict) } }).ToArray();
             var nullSetters = columns.Select(p => p.Property.Name).ToDictionary(n => n, n => typeof(T).GetMethod("Set" + n + "Null", bindingFlags));
 
@@ -250,7 +262,11 @@ namespace System.Data
             if (type.Name == typeof(Nullable<>).Name)
                 return GetDbType(type.GetGenericArguments()[0]);
 
+#if NETSTANDARD1_3
             if (type.GetTypeInfo().IsEnum) return DbType.String;
+#else
+            if (type.IsEnum) return DbType.String;
+#endif
 
             if (type == typeof(byte)) return DbType.Byte;
             if (type == typeof(bool)) return DbType.Boolean;
@@ -310,7 +326,11 @@ namespace System.Data
                 nullable = true;
             }
 
+#if NETSTANDARD1_3
             var typeInfo = type.GetTypeInfo();
+#else
+            var typeInfo = type;
+#endif
             if (type == typeof(string)) nullable = true;
             else if (type == typeof(byte[])) nullable = true;
             else if (typeInfo.IsClass) //other than text or blob
@@ -336,7 +356,11 @@ namespace System.Data
         private static object DefaultOrThrow(Type type, bool strict)
         {
             if (strict) throw new IndexOutOfRangeException();
+#if NETSTANDARD1_3
             if (type.GetTypeInfo().IsClass) return null;
+#else
+            if (type.IsClass) return null;
+#endif
             return Activator.CreateInstance(type);
         }
 

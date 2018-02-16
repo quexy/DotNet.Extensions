@@ -111,7 +111,11 @@ namespace System.IO
         {
             if (type == null) throw new ArgumentNullException("type");
 
+#if NETSTANDARD1_0
             var typeInfo = type.GetTypeInfo();
+#else
+            var typeInfo = type;
+#endif
             if (typeInfo.IsClass)
                 throw new NotSupportedException("Reference types are not supported");
             if (type.Name == typeof(Nullable<>).Name)
@@ -144,7 +148,11 @@ namespace System.IO
         {
             if (type == null) throw new ArgumentNullException("type");
 
+#if NETSTANDARD1_0
             var typeInfo = type.GetTypeInfo();
+#else
+            var typeInfo = type;
+#endif
             if (typeInfo.IsClass)
                 throw new NotSupportedException("Reference types are not supported");
             if (type.Name == typeof(Nullable<>).Name)
@@ -196,7 +204,11 @@ namespace System.IO
         {
             if (type == null) throw new ArgumentNullException("type");
 
+#if NETSTANDARD1_0
             var typeInfo = type.GetTypeInfo();
+#else
+            var typeInfo = type;
+#endif
             if (typeInfo.IsClass)
                 throw new NotSupportedException("Reference types are not supported");
             if (type.Name == typeof(Nullable<>).Name)

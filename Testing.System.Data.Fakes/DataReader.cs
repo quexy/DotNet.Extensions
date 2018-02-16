@@ -23,10 +23,10 @@ namespace System.Data.Fakes
             this.rows = rows;
         }
 
-        public object this[int i] => columns[i].GetValue(rows[index]) ?? DBNull.Value;
+        public object this[int i] => columns[i].GetValue(rows[index], null) ?? DBNull.Value;
 
         public object this[string name] => columns.Where(p => comparer.Equals(p.Name, name))
-            .Select(p => p.GetValue(rows[index]) ?? DBNull.Value) ?? throw new IndexOutOfRangeException();
+            .Select(p => p.GetValue(rows[index], null) ?? DBNull.Value) ?? throw new IndexOutOfRangeException();
 
         public string GetName(int i) => columns[i].Name;
 
@@ -67,7 +67,7 @@ namespace System.Data.Fakes
         {
             if (values == null) throw new ArgumentNullException(nameof(GetValues));
             var length = Math.Min(values.Length, columns.Length);
-            var buffer = columns.Select(c => c.GetValue(rows[index]) ?? DBNull.Value).ToArray();
+            var buffer = columns.Select(c => c.GetValue(rows[index], null) ?? DBNull.Value).ToArray();
             Array.Copy(buffer, values, length);
             return length;
         }
