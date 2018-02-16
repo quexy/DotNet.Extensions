@@ -284,7 +284,8 @@ namespace System.Data
             var param = command.CreateParameter();
             param.ParameterName = name;
             param.DbType = dbType;
-            param.Value = value;
+            // some adapters fail on 'null'
+            param.Value = value ?? DBNull.Value;
 
             command.Parameters.Add(param);
             return param;
