@@ -16,6 +16,11 @@ namespace System.Data.Fakes.QueryHandling
             return new QueryHandlerBuilder().SetupScalar<T>(callback);
         }
 
+        public static IExecuteScalarQueryHandlerBuilder<object> ForScalar(BuilderFinished callback = null)
+        {
+            return new QueryHandlerBuilder().SetupScalar(callback);
+        }
+
         public static IExecuteReaderQueryHandlerBuilder<T> ForReader<T>(BuilderFinished callback = null) where T : class
         {
             return new QueryHandlerBuilder().SetupReader<T>(callback);
@@ -38,6 +43,16 @@ namespace System.Data.Fakes.QueryHandling
             builder.Finished += obj => Finished(obj);
             return builder;
         }
+
+        public IExecuteScalarQueryHandlerBuilder<object> SetupScalar() { return SetupScalar(null); }
+        public IExecuteScalarQueryHandlerBuilder<object> SetupScalar(BuilderFinished callback)
+        {
+            if (callback != null) Finished += callback;
+            var builder = new Impl.ExecuteScalarObjectQueryHandlerBuilder();
+            builder.Finished += obj => Finished(obj);
+            return builder;
+        }
+
 
         public IExecuteReaderQueryHandlerBuilder<T> SetupReader<T>() where T : class { return SetupReader<T>(null); }
         public IExecuteReaderQueryHandlerBuilder<T> SetupReader<T>(BuilderFinished callback) where T : class

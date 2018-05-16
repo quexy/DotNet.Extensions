@@ -4,6 +4,7 @@ namespace System.Data.Fakes.QueryHandling
     {
         IExecuteReaderQueryHandlerBuilder<T> SetupReader<T>() where T : class;
         IExecuteScalarQueryHandlerBuilder<T> SetupScalar<T>() where T : struct;
+        IExecuteScalarQueryHandlerBuilder<object> SetupScalar();
         IExecuteNonQueryQueryHandlerBuilder SetupNonQuery();
     }
 
