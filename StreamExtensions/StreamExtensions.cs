@@ -23,6 +23,12 @@ namespace System.IO
             throw new InvalidOperationException(WrongRead(read, length));
         }
 
+        /// <summary> Reads an array from the stream; length is the next one byte in the specified endianness </summary>
+        public static byte[] ReadShortBytes(this Stream stream, Endianness endianness = Endianness.Unspecified)
+        {
+            return stream.ReadBuffer(stream.ReadValue<byte>(endianness));
+        }
+
         /// <summary> Reads an array from the stream; length is the next four bytes in the specified endianness </summary>
         public static byte[] ReadBytes(this Stream stream, Endianness endianness = Endianness.Unspecified)
         {
@@ -63,6 +69,14 @@ namespace System.IO
             if (buffer != null && buffer.Length > 0)
                 stream.Write(buffer, 0, buffer.Length);
             return stream;
+        }
+
+        /// <summary> Writes the length and the array into the stream; length should fit into a single byte </summary>
+        /// <exception cref="ArgumentOutOfRangeException"> if the buffer's length doesn't fit into a single byte </exception>
+        public static Stream WriteShortBytes(this Stream stream, byte[] buffer, Endianness endianness = Endianness.Unspecified)
+        {
+            if (buffer.Length > byte.MaxValue) throw new ArgumentOutOfRangeException(nameof(buffer), "the buffer is too long");
+            return stream.WriteValue((byte)buffer.Length, endianness).WriteBuffer(buffer);
         }
 
         /// <summary> Writes the length and the array into the stream; length (4 bytes) is converted to the specified endianness </summary>

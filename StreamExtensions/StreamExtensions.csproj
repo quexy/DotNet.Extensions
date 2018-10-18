@@ -18,7 +18,7 @@
     <PackageTags>stream extensions</PackageTags>
     <PackageId>quexy.StreamExtensions</PackageId>
     <Product>quexy.StreamExtensions</Product>
-    <Version>2.1.1</Version>
+    <Version>2.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.0'">
