@@ -36,14 +36,14 @@ namespace System.IO
             return encoding.GetString(stream.ReadBuffer(length), 0, length);
         }
 
-        /// <summary> Reads a string in the specified encoding from the stream; lenght is the next byte in the stream </summary>
+        /// <summary> Reads a string in the specified encoding from the stream; length is the next byte in the stream </summary>
         public static string ReadShortString(this Stream stream, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
             if (encoding == null) encoding = GetDefaultEncoding(endianness);
             return ReadFixString(stream, ReadValue<byte>(stream, endianness), encoding);
         }
 
-        /// <summary> Reads a string in the specified encoding from the stream; lenght (4 bytes) read in the given endianness </summary>
+        /// <summary> Reads a string in the specified encoding from the stream; length (4 bytes) read in the given endianness </summary>
         public static string ReadString(this Stream stream, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
             if (encoding == null) encoding = GetDefaultEncoding(endianness);
@@ -65,24 +65,22 @@ namespace System.IO
             return stream;
         }
 
-        /// <summary> Writes length and the array into the stream; length (4 bytes) is converted to the specified endianness </summary>
+        /// <summary> Writes the length and the array into the stream; length (4 bytes) is converted to the specified endianness </summary>
         public static Stream WriteBytes(this Stream stream, byte[] buffer, Endianness endianness = Endianness.Unspecified)
         {
             return stream.WriteValue(buffer.Length, endianness).WriteBuffer(buffer);
         }
 
-        /// <summary> Writes the string to the stream after padding it to the given length </summary>
-        /// <exception cref="ArgumentException"> if the string is longer than specified </exception>
+        /// <summary> Writes the given amount of bytes of the string padded with spaces to the stream </summary>
         public static Stream WriteFixString(this Stream stream, string value, int length, Encoding encoding = null)
         {
             if (encoding == null) encoding = GetDefaultEncoding(Endianness.Unspecified);
-            value = (value ?? "").PadRight(length, ' ');
-            if (value.Length > length) // verify string is exactly 'length' long
-                throw new ArgumentException(nameof(value), "the string is too long");
-            return stream.WriteBuffer(encoding.GetBytes(value));
+            var buffer = encoding.GetBytes((value ?? "").PadRight(length, ' '));
+            return stream.WriteBuffer(buffer.Take(length).ToArray());
         }
 
-        /// <summary> Writes length and the string to the stream; length should fit into a byte </summary>
+        /// <summary> Writes the length and the string to the stream; length should fit into one byte </summary>
+        /// <exception cref="ArgumentOutOfRangeException"> if the string's length (along the encoding) doesn't fit into a single byte </exception>
         public static Stream WriteShortString(this Stream stream, string value, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
             if (encoding == null) encoding = GetDefaultEncoding(endianness);
@@ -92,7 +90,7 @@ namespace System.IO
             return stream.WriteValue((byte)buffer.Length, endianness).WriteBuffer(buffer);
         }
 
-        /// <summary> Writes length and the string to the stream; length is converted to the specified endianness </summary>
+        /// <summary> Writes the length and the string to the stream; length (4 bytes) is converted to the specified endianness </summary>
         public static Stream WriteString(this Stream stream, string value, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
             if (encoding == null) encoding = GetDefaultEncoding(endianness);
@@ -235,7 +233,8 @@ namespace System.IO
                     .Concat(mixedBytes.Skip(10).Take(6));
                 // result has to be platform endian
                 return (BitConverter.IsLittleEndian)
-                    ? bigEndBytes.Reverse().ToArray() : bigEndBytes.ToArray();
+                    ? bigEndBytes.Reverse().ToArray()
+                    : bigEndBytes.ToArray();
             }
             if (type == typeof(int)) return BitConverter.GetBytes((int)value);
             if (type == typeof(long)) return BitConverter.GetBytes((long)value);
