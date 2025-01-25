@@ -175,8 +175,8 @@ namespace System.IO
             if (type == typeof(bool)) return BitConverter.ToBoolean(buffer, startIndex);
             if (type == typeof(byte)) return buffer[startIndex];
             if (type == typeof(char)) return BitConverter.ToChar(buffer, startIndex);
-            if (type == typeof(DateTime)) return new DateTime(ChangeType<long>(buffer));
-            if (type == typeof(decimal)) return new decimal(Enumerable.Range(0, startIndex)
+            if (type == typeof(DateTime)) return new DateTime(ChangeType<long>(buffer, startIndex));
+            if (type == typeof(decimal)) return new decimal(Enumerable.Range(0, 4)
                     .Select(n => BitConverter.ToInt32(buffer, startIndex + n * 4)).ToArray());
             if (type == typeof(double)) return BitConverter.ToDouble(buffer, startIndex);
             if (type == typeof(float)) return BitConverter.ToSingle(buffer, startIndex);
