@@ -7,6 +7,7 @@ namespace System.IO
 {
     public static class StreamExtensions
     {
+        private static emptyArray = new byte[0];
         public static Endianness Endianness = Endianness.Unspecified;
 
         /// <summary> Reads the specified amount of bytes from the stream </summary>
@@ -15,12 +16,21 @@ namespace System.IO
         {
             if (stream == null) throw new ArgumentNullException("stream");
             if (length < 0) throw new ArgumentOutOfRangeException("length", "length cannot be negtive");
-            if (length == 0) return new byte[0];
+            if (length == 0) return emptyArray;
 
+            var offset = 0;
             var buffer = new byte[length];
-            var read = stream.Read(buffer, 0, buffer.Length);
-            if (read == length) return buffer;
-            throw new InvalidOperationException(WrongRead(read, length));
+            while (offset < length)
+            {
+                // Strea.Read() might return less than the requested amount.
+                // Guaranteed to read at least one byte unless end of stream.
+                var read = stream.Read(buffer, offset, buffer.Length - offset);
+                offset += read; // store our progress, migth need another try
+                
+                if (read != 0) continue; // ...or fail if end of stream
+                throw new InvalidOperationException(WrongRead(read, length));
+            }
+            return buffer;
         }
 
         /// <summary> Reads an array from the stream; length is the next one byte in the specified endianness </summary>
@@ -46,7 +56,7 @@ namespace System.IO
         public static string ReadShortString(this Stream stream, Encoding encoding = null, Endianness endianness = Endianness.Unspecified)
         {
             if (encoding == null) encoding = GetDefaultEncoding(endianness);
-            return ReadFixString(stream, ReadValue<byte>(stream, endianness), encoding);
+            return stream.ReadFixString(ReadValue<byte>(stream, endianness), encoding);
         }
 
         /// <summary> Reads a string in the specified encoding from the stream; length (4 bytes) read in the given endianness </summary>
@@ -99,7 +109,7 @@ namespace System.IO
         {
             if (encoding == null) encoding = GetDefaultEncoding(endianness);
             var buffer = encoding.GetBytes(value ?? "");
-            if (buffer.Length > byte.MaxValue) //verify length fits into a single byte
+            if (buffer.Length > byte.MaxValue) // verify length fits into a single byte
                 throw new ArgumentOutOfRangeException(nameof(value), "the string is too long");
             return stream.WriteValue((byte)buffer.Length, endianness).WriteBuffer(buffer);
         }
@@ -122,16 +132,7 @@ namespace System.IO
         private static int GetLength(Type type)
         {
             if (type == null) throw new ArgumentNullException("type");
-
-#if NETSTANDARD1_0
-            var typeInfo = type.GetTypeInfo();
-#else
-            var typeInfo = type;
-#endif
-            if (typeInfo.IsClass)
-                throw new NotSupportedException("Reference types are not supported");
-            if (type.Name == typeof(Nullable<>).Name)
-                throw new InvalidOperationException("Nullable<> is not supported");
+            VerifySupported(type); // not a class, interface, or Nullable<T>
 
             if (typeInfo.IsEnum) type = Enum.GetUnderlyingType(type);
 
@@ -159,16 +160,7 @@ namespace System.IO
         private static object ChangeType(byte[] buffer, Type type, int startIndex)
         {
             if (type == null) throw new ArgumentNullException("type");
-
-#if NETSTANDARD1_0
-            var typeInfo = type.GetTypeInfo();
-#else
-            var typeInfo = type;
-#endif
-            if (typeInfo.IsClass)
-                throw new NotSupportedException("Reference types are not supported");
-            if (type.Name == typeof(Nullable<>).Name)
-                throw new InvalidOperationException("Nullable<> is not supported");
+            VerifySupported(type); // not a class, interface, or Nullable<T>
 
             if (typeInfo.IsEnum) type = Enum.GetUnderlyingType(type);
 
@@ -183,15 +175,14 @@ namespace System.IO
             if (type == typeof(Guid))
             {
                 var bytes = buffer.Skip(startIndex).Take(16).ToArray();
-                // 'bytes' is platform endian; convert to big endian
-                var bigEndBytes = (BitConverter.IsLittleEndian)
-                    ? bytes.Reverse().ToArray() : bytes;
+                // if platform is little endian, then reverse to big endian
+                if (BitConverter.IsLittleEndian) Array.Reverse(bytes);
                 var mixedBytes = Enumerable.Empty<byte>()
-                    .Concat(bigEndBytes.Skip(0).Take(4).Reverse())
-                    .Concat(bigEndBytes.Skip(4).Take(2).Reverse())
-                    .Concat(bigEndBytes.Skip(6).Take(2).Reverse())
-                    .Concat(bigEndBytes.Skip(8).Take(2))
-                    .Concat(bigEndBytes.Skip(10).Take(6));
+                    .Concat(bytes.Skip(0).Take(4).Reverse())
+                    .Concat(bytes.Skip(4).Take(2).Reverse())
+                    .Concat(bytes.Skip(6).Take(2).Reverse())
+                    .Concat(bytes.Skip(8).Take(2))
+                    .Concat(bytes.Skip(10).Take(6));
                 return new Guid(mixedBytes.ToArray());
             }
             if (type == typeof(int)) return BitConverter.ToInt32(buffer, startIndex);
@@ -215,16 +206,7 @@ namespace System.IO
         private static byte[] GetBytes(object value, Type type)
         {
             if (type == null) throw new ArgumentNullException("type");
-
-#if NETSTANDARD1_0
-            var typeInfo = type.GetTypeInfo();
-#else
-            var typeInfo = type;
-#endif
-            if (typeInfo.IsClass)
-                throw new NotSupportedException("Reference types are not supported");
-            if (type.Name == typeof(Nullable<>).Name)
-                throw new InvalidOperationException("Nullable<> is not supported");
+            VerifySupported(type); // not a class, interface, or Nullable<T>
 
             if (typeInfo.IsEnum) type = Enum.GetUnderlyingType(type);
 
@@ -239,16 +221,15 @@ namespace System.IO
             if (type == typeof(Guid))
             {
                 var mixedBytes = ((Guid)value).ToByteArray();
-                var bigEndBytes = Enumerable.Empty<byte>()
+                var bytes = Enumerable.Empty<byte>()
                     .Concat(mixedBytes.Skip(0).Take(4).Reverse())
                     .Concat(mixedBytes.Skip(4).Take(2).Reverse())
                     .Concat(mixedBytes.Skip(6).Take(2).Reverse())
                     .Concat(mixedBytes.Skip(8).Take(2))
                     .Concat(mixedBytes.Skip(10).Take(6));
-                // result has to be platform endian
-                return (BitConverter.IsLittleEndian)
-                    ? bigEndBytes.Reverse().ToArray()
-                    : bigEndBytes.ToArray();
+                // 'bytes' is big endian, result has to be platform endian
+                if (BitConverter.IsLittleEndian) Array.Reverse(bytes);
+                return bytes;
             }
             if (type == typeof(int)) return BitConverter.GetBytes((int)value);
             if (type == typeof(long)) return BitConverter.GetBytes((long)value);
@@ -282,14 +263,17 @@ namespace System.IO
 
             if (BitConverter.IsLittleEndian)
             {
-                if (end != Endianness.BigEndian) return data;
-                else /* reverse */ return data.Reverse().ToArray();
+                // reverse if big endian required
+                if (end == Endianness.BigEndian)
+                    Array.Reverse(data);
             }
             else // architecture is big endian
             {
-                if (end != Endianness.LittleEndian) return data;
-                else /* reverse */ return data.Reverse().ToArray();
+                // reverse if little endian required
+                if (end == Endianness.LittleEndian)
+                    Array.Reverse(data);
             }
+            return data;
         }
 
         private static Encoding GetDefaultEncoding(Endianness endianness)
@@ -305,6 +289,21 @@ namespace System.IO
                 return (end != Endianness.LittleEndian)
                     ? Encoding.BigEndianUnicode
                     : Encoding.Unicode;
+        }
+
+        private static void VerifySupported(Type type)
+        {
+#if NETSTANDARD1_0
+            var typeInfo = type.GetTypeInfo();
+#else
+            var typeInfo = type;
+#endif
+            if (typeInfo.IsClass)
+                throw new NotSupportedException("Reference types are not supported");
+            if (typeInfo.IsInterface)
+                throw new NotSupportedException("Interfaces are not supported");
+            if (type.Name == typeof(Nullable<>).Name)
+                throw new InvalidOperationException("Nullable<> is not supported");
         }
     }
 }
