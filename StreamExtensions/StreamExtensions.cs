@@ -22,7 +22,7 @@ namespace System.IO
             var buffer = new byte[length];
             while (offset < length)
             {
-                // Strea.Read() might return less than the requested amount.
+                // Stream.Read() might return less than the requested amount.
                 // Guaranteed to read at least one byte unless end of stream.
                 var read = stream.Read(buffer, offset, buffer.Length - offset);
                 offset += read; // store our progress, migth need another try
